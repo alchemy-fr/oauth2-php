@@ -335,6 +335,9 @@ define("OAUTH2_ERROR_INSUFFICIENT_SCOPE", "insufficient_scope");
  */
 abstract class OAuth2
 {
+  const TOKEN_ONLY_IN_HEADER  = 'token_only_in_header';
+  const TOKEN_ONLY_IN_GETPOST = 'token_only_in_getpost';
+  const TOKEN_AUTO_FIND       = 'token_auto_find';
 
   /**
    * Array of persistent variables stored.
@@ -935,7 +938,7 @@ abstract class OAuth2
    * Either from the Authorization header or GET/POST/etc.
    *
    * @param $useTokenHeader
-   *    Specify token to use, if null check header first, then GET and POST
+   *    Specify token to use, default self::TOKEN_AUTO_FIND
    *
    * @return
    *   Access token value if present, and FALSE if it isn't.
@@ -946,11 +949,11 @@ abstract class OAuth2
    *
    * @ingroup oauth2_section_5
    */
-  protected function getAccessTokenParams($useTokenHeader = null)
+  protected function getAccessTokenParams($useTokenHeader = self::TOKEN_AUTO_FIND)
   {
       $auth_header = $this->getAuthorizationHeader();
 
-      if ($auth_header !== FALSE && (true === $useTokenHeader || null === $useTokenHeader)) {
+      if ($auth_header && $useTokenHeader !== self::TOKEN_ONLY_IN_GETPOST) {
           // Make sure only the auth header is set
           if (isset($_GET[OAUTH2_TOKEN_PARAM_NAME]) || isset($_POST[OAUTH2_TOKEN_PARAM_NAME]))
           {
@@ -969,7 +972,7 @@ abstract class OAuth2
           return $matches[1];
       }
 
-      if (false === $auth_header && (false === $useTokenHeader || null === $useTokenHeader)) {
+      if (!$auth_header && $useTokenHeader !== self::TOKEN_ONLY_IN_HEADER) {
           if (isset($_GET[OAUTH2_TOKEN_PARAM_NAME]))
           {
               if (isset($_POST[OAUTH2_TOKEN_PARAM_NAME])) // Both GET and POST are not allowed
