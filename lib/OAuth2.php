@@ -985,8 +985,6 @@ abstract class OAuth2
               return $_POST[OAUTH2_TOKEN_PARAM_NAME];
       }
 
-      $this->errorJsonResponse(OAUTH2_HTTP_BAD_REQUEST, OAUTH2_ERROR_INVALID_REQUEST, 'Invalid send of token');
-
       return FALSE;
   }
 
